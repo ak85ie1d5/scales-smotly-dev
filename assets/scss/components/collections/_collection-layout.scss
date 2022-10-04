@@ -93,7 +93,7 @@
   text-align: center;
 
   span {
-    @extend %meta-text;
+    //@extend %meta-text;
     @extend %smallcaps;
     display: table-cell;
     vertical-align: middle;

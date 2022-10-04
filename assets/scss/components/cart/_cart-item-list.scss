@@ -51,7 +51,7 @@
     // Mobile Headings
     &:not(.cart-item-content)::before {
       @include breakpoint(m-down) {
-        @extend %paragraph;
+        //@extend %paragraph;
         @include align(bottom);
         width: 100%;
         padding-bottom: $gutter-third;

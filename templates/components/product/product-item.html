@@ -1,0 +1,177 @@
+<figure
+  class="product-item"
+  {{#if overlay '===' 'collection_procucts_overlay_image_preview'}}
+    data-product-id="{{id}}"
+    data-image-preview
+  {{/if}}
+  {{#if data_tag_enabled}}
+    data-event-type="{{event}}"
+    data-entity-id="{{id}}"
+    data-position="{{position}}"
+    data-name="{{name}}"
+    data-product-category="{{#each category}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}"
+    data-product-brand="{{brand.name}}"
+    data-product-price="{{#if price.with_tax}}{{price.with_tax.value}}{{else}}{{price.without_tax.value}}{{/if}}"
+  {{/if}}
+>
+
+  <div class="product-item-container">
+
+<!-- Custom    <a class="product-item-image-link slides-item" title="{{name}}">-->
+<a class="product-item-image-link slides-item" href="{{url}}" title="{{name}}">
+        {{#if image}}
+            <div class="slider-cell">
+                {{> components/common/responsive-image
+                    image=image
+                    class="product-item-image"
+                    fit="cover"
+                    fallback_size=fallback_size
+                    lazyload=lazyload
+                    default_image=default_image
+                }}
+            </div>
+            {{#if images}}
+                {{#each images}}
+                <div class="slider-cell">
+                    <img
+                    class="show-for-sr"
+                    alt="{{this.alt}}"
+                    data-flickity-lazyload="{{getImage this 'large'}}"
+                    >
+                </div>
+            {{/each}}
+        {{/if}}
+        {{else}}
+        <img
+          class="product-item-image"
+          src="{{cdn '/assets/img/no-image.svg'}}"
+        />
+      {{/if}}
+    </a>
+
+    {{#if overlay '===' 'collection_procucts_overlay_image_preview'}}
+      <div class="product-item-image-preview" data-image-preview-container>
+        {{> components/collection/collection-image-preview}}
+      </div>
+    {{/if}}
+  </div>
+
+  <div
+    class="product-item-overlay {{#if out_of_stock_message}}out-of-stock{{/if}}"
+  >
+    <div class="product-item-overlay-inner">
+      <div class="product-item-details">
+        {{#if out_of_stock_message}}
+          <span class="product-out-of-stock">
+            {{out_of_stock_message}}
+          </span>
+        {{else}}
+          {{#if brand.name}}
+            <span class="product-item-brand">
+              {{brand.name}}
+            </span>
+          {{/if}}
+        {{/if}}
+
+        {{#if show_rating}}
+        <div class="product-rating">
+          {{> components/reviews/ratings
+            rating=rating
+          }}
+        </div>
+      {{/if}}
+
+        <h5 class="product-item-name">
+          <a href="{{url}}" title="{{name}}">
+            {{name}}
+          </a>
+        </h5>
+
+        <span class="product-item-price" id="span_id">
+          {{> core/products/price
+            context="product-item"
+            retail_price_label=retail_price_label
+            non_sale_price_label=non_sale_price_label
+            sale_price_label=sale_price_label
+            price_label=price_label
+            show_tax_labels=true
+            show_amp_classes=true
+            price_range_display=price_range_display
+            sale_badges=sale_badges
+          }}
+        </span>
+
+        <a class="product-item-link" href="{{url}}" title="{{name}}">
+          <span class="product-item-link-label show-for-sr">
+            {{name}}
+          </span>
+        </a>
+        <div class="product-details-price">
+             {{call_for_price}}
+          </div>
+        <button class="product-item-quick-shop" data-quick-shop-trigger="{{id}}">
+          <span class="product-item-quick-shop-label">
+            {{lang 'core.product.quickshop.view'}}
+          </span>
+          <svg><use xlink:href="#icon-plus"></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {{#if sale_badges}}
+    {{> core/products/sale-badge
+      classes="product-item-sale-badge"
+    }}
+  {{/if}}
+
+  {{#if show_remove}}
+    <form
+      class="form product-item-remove"
+      action="{{remove_url}}"
+      method="post"
+    >
+      <button type="submit">
+        <svg><use xlink:href="#icon-close"></svg>
+      </button>
+    </form>
+  {{/if}}
+</figure>
+
+<script src="https://unpkg.com/flickity@2/dist/flickity.pkgd.min.js"></script>
+<script
+  src="https://code.jquery.com/jquery-3.6.0.slim.js"
+  integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY="
+  crossorigin="anonymous"></script>
+<script>
+    (function($){
+        $(document).ready(function(){
+            $('.slides-item').flickity({
+                cellAlign:'left',
+                wrapAround: true,
+                lazyLoad: true,
+            });
+        });
+    })(jQuery)
+</script>
+
+
+
+<script type="text/javascript">
+
+    function hasNumber(myString) {
+      return /\d/.test(myString);
+    }
+
+    console.log('---');
+    var els = document.getElementsByClassName("product-item-price");
+    Array.prototype.forEach.call(els, function(el) {
+        if (hasNumber(el.textContent) == false) {
+            el.textContent = "VENDU";
+        }
+        // console.log(hasNumber(el.textContent));
+    });
+    console.log('-');
+</script>
+
+

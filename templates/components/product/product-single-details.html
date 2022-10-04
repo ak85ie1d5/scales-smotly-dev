@@ -1,0 +1,1693 @@
+<div
+  class="product-details"
+  data-product-details
+  data-product-title="{{product.title}}"
+  {{#if settings.data_tag_enabled}}
+    data-event-type="product"
+    data-entity-id="{{product.id}}"
+    data-name="{{product.title}}"
+    data-product-category="{{#each product.category}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}"
+    data-product-brand="{{product.brand.name}}"
+    data-product-price="{{#if product.price.with_tax}}{{product.price.with_tax.value}}{{else}}{{product.price.without_tax.value}}{{/if}}"
+    data-product-variant="single-product-option"
+  {{/if}}
+>
+  {{#unless product.out_of_stock_message}}
+    <link itemprop="availability" href="http://schema.org/InStock">
+  {{else}}
+    <link itemprop="availability" href="http://schema.org/OutOfStock">
+  {{/unless}}
+
+  {{#if product.brand}}
+    <span class="product-details-brand">
+      <a href="{{product.brand.url}}" alt="{{product.brand.name}}">
+        {{product.brand.name}}
+      </a>
+    </span>
+  {{/if}}
+
+  <h1 class="product-details-title">
+    {{product.title}}
+  </h1>
+
+  <div class="product-details-price">
+    {{#if product.call_for_price}}
+      {{product.call_for_price}}
+    {{/if}}
+    {{#if product.price}}
+      {{> core/products/price
+        price=product.price
+        show_savings=false
+        price_range_display=theme_settings.price_range_display
+        retail_price_label=theme_settings.retail-price-label
+        non_sale_price_label=theme_settings.non-sale-price-label
+        sale_price_label=theme_settings.sale-price-label
+        price_label=theme_settings.price-label
+        sale_badges=theme_settings.sale-badges
+      }}
+    {{/if}}
+  </div>
+
+  {{{region name="product_below_price"}}}
+   <form
+    method="post"
+    class="form"
+    id="product-add-cart"
+    action="{{product.cart_url}}"
+    enctype="multipart/form-data"
+    data-cart-item-add
+    data-product-options-count="{{product.options.length}}"
+    data-validated-form
+  >
+    <input type="hidden" name="action" value="add">
+    <input
+      type="hidden"
+      name="product_id"
+      value="{{product.id}}"
+      data-product-id
+    >
+
+    <div
+      class="product-details-rating-container"
+      itemprop="aggregateRating"
+      itemscope
+      itemtype="http://schema.org/AggregateRating"
+    >
+      {{#if settings.show_product_rating}}
+        <meta itemprop="ratingValue" content="{{product.rating}}">
+        <meta itemprop="ratingCount" content="{{product.num_reviews}}">
+        {{> components/reviews/ratings rating=product.rating}}
+      {{/if}}
+      {{#if settings.show_product_reviews}}
+        <meta itemprop="reviewCount" content="{{product.num_reviews}}">
+        <a href="#" class="product-details-rating-count" data-reviews-list>
+          {{#if settings.show_product_rating}}
+            (<span>
+              {{ lang 'product.reviews.review_count' num_reviews=product.num_reviews }}
+            </span>)
+          {{else}}
+            <span>
+              {{lang 'product.reviews.review_count_alt' num_reviews=product.num_reviews}}
+            </span>
+          {{/if}}
+        </a>
+      {{/if}}
+    </div>
+
+    {{#each product.reviews.messages}}
+      {{#if error}}
+        {{> core/alerts/alert-error message=error dismissable=false}}
+      {{/if}}
+      {{#if success}}
+        {{> core/alerts/alert-success message=success dismissable=false}}
+      {{/if}}
+    {{/each}}
+
+    <div data-product-option-message></div>
+
+    <div
+      class="
+        product-details-container
+        {{#unless product.can_purchase}}
+          no-purchase
+        {{/unless}}
+      "
+    >
+      {{#if product.options}}
+        <div class="product-details-options" data-product-option-change>
+          {{#each product.options}}
+            {{{dynamicComponent 'core/forms/options'}}}
+          {{/each}}
+        </div>
+      {{/if}}
+
+      {{#if product.customizations}}
+        <div class="product-details-customizations" data-product-option-change>
+          {{#each product.customizations}}
+            {{{dynamicComponent 'core/forms/customizations'}}}
+          {{/each}}
+        </div>
+      {{/if}}
+
+      {{#if product.event_date}}
+        {{> core/products/event}}
+      {{/if}}
+
+      {{#if theme_settings.show_product_quantity_box}}
+        <div
+          class="form-field form-field-number form-field-quantity"
+          data-product-quantity
+        >
+          <label class="form-label" for="quantity">
+            <span class="form-field-title">
+              {{lang 'product.quantity'}}
+            </span>
+
+              <div class="form-field-control">
+                <div class="quantity-toggle-container">
+                  <span
+                    class="quantity-toggle quantity-decrement"
+                    data-product-quantity-change
+                    data-quantity-decrement
+                  >
+                    <svg class="quantity-icon">
+                      <use xlink:href="#icon-minus">
+                    </svg>
+                  </span>
+                </div>
+
+                <input
+                  class="quantity-input form-input"
+                  type="text"
+                  name="qty[]"
+                  value="{{#if product.min_purchase_quantity}}{{product.min_purchase_quantity}}{{else}}1{{/if}}"
+                  min="{{#if product.min_purchase_quantity}}{{product.min_purchase_quantity}}{{else}}0{{/if}}"
+                  max="{{#if product.max_purchase_quantity '!==' 0}}{{product.max_purchase_quantity}}{{/if}}"
+                  data-product-quantity-input
+                >
+
+                <div class="quantity-toggle-container">
+                  <span
+                    class="quantity-toggle quantity-increment"
+                    data-product-quantity-change
+                    data-quantity-increment
+                  >
+                    <svg class="quantity-icon">
+                      <use xlink:href="#icon-plus">
+                      </svg>
+                  </span>
+                </div>
+              </div>
+          </label>
+        </div>
+      {{/if}}
+
+      <div class="product-details-stock">
+        <span
+          class="
+            form-field-title
+            {{#unless product.stock_level}}
+              product-details-hidden
+            {{/unless}}
+          "
+          data-product-stock
+        >
+          {{lang 'product.current_stock'}}
+        </span>
+        <span
+          class="{{#unless product.stock_level}}product-details-hidden{{/unless}}"
+          data-product-stock
+          data-product-stock-level
+        >
+          {{#if product.stock_level}}
+            {{product.stock_level}}
+          {{else}}
+            0
+          {{/if}}
+        </span>
+
+        {{#if product.out_of_stock}}
+          <span class="stock-message">
+            {{#if product.out_of_stock_message}}
+              {{product.out_of_stock_message}}
+            {{else}}
+              {{lang 'product.sold_out'}}
+            {{/if}}
+          </span>
+        {{/if}}
+      </div>
+    </div>
+
+    <div data-product-cart-message></div>
+
+    <div class="product-details-add-cart form-field">
+      {{#if product.can_purchase}}
+        <button
+          type="submit"
+          class="button"
+          data-button-purchase
+          {{#if product.pre_order}}
+            data-button-preorder
+          {{/if}}
+          {{#if settings.data_tag_enabled}}
+            data-event-type="product-click"
+          {{/if}}
+        >
+          <span data-button-text>
+            {{#if product.pre_order}}
+              {{lang 'product.pre_order'}}
+            {{else}}
+              {{lang 'product.add_to_cart'}}
+            {{/if}}
+          </span>
+        </button>
+      {{else}}
+        <button
+          class="button button-disabled"
+          data-button-purchase
+          disabled
+          {{#if settings.data_tag_enabled}}
+            data-event-type="product-click"
+          {{/if}}
+        >
+          <span data-button-text>
+            {{lang 'product.unavailable'}}
+          </span>
+        </button>
+      {{/if}}
+    </div>
+
+    <div class="product-details-view-product">
+      <a class="button button-alt" href="{{product.url}}">
+        {{lang 'product.view_product_details'}}
+      </a>
+    </div>
+  </form>
+
+    <div class="product-details-share-wishlist">
+        <div class="product-details-add-cart form-field">
+         <a id="questBtn" href="/produits-contact/?sku={{product.sku}}&title={{product.title}}">
+        <button
+          type="submit"
+          class="button btnCtc">
+          <span data-button-text>
+              Contactez-nous
+          </span>
+        </button>
+        </a>
+    </div>
+      {{#if settings.show_wishlist}}
+        <button
+          class="product-details-wishlist"
+          href="{{product.add_to_wishlist_url}}"
+          data-wishlist-button
+        >
+          <svg><use xlink:href="#icon-heart"></use></svg>
+          <span>{{lang 'product.add_to_wishlist'}}</span>
+        </button>
+        <div class="wishlist-modal" data-wishlist-modal>
+          {{> components/wishlist/wishlist-modal}}
+        </div>
+      {{/if}}
+
+      {{#if product.add_this.length}}
+        <button class="product-details-share" data-product-share-toggle>
+          <svg><use xlink:href="#icon-share"></use></svg>
+          <span>{{lang 'product.share'}}</span>
+        </button>
+
+        {{> components/common/sharing-buttons
+          sharing_title=product.title
+          sharing_url=product.url
+          sharing_image=product.main_image
+        }}
+      {{/if}}
+    </div>
+
+  <div data-product-message></div>
+  <div data-wishlist-message></div>
+  
+
+  {{#if product.description}}
+    <div class="product-details-description" itemprop="description">
+      {{{product.description}}}
+      {{#if product.custom_fields}}
+      {{#each product.custom_fields}}
+        <div class="product-additional-info-container product-additional-custom-fields">
+          <span class="product-additional-info-key">
+            {{name}}
+          </span>
+          <span class="product-additional-info-value">
+            {{{value}}}
+          </span>
+        </div>
+      {{/each}}
+    {{/if}}
+    </div>
+  {{/if}}
+
+  {{#unless theme_settings.single-product-hide-details}}
+    {{#or
+      product.sku
+      product.upc
+      product.stock_level
+      product.condition
+      product.availability
+      product.release_date
+      product.weight
+      product.gift_wrapping_available
+      product.shipping
+      product.custom_fields
+    }}
+    <div
+          class="product-details-additional-content accordion-content" style="display:block;"
+          data-accordion-content
+        >
+          {{> components/product/additional-info}}
+        </div>
+    {{/or}}
+  {{/unless}}
+
+  {{#if product.warranty}}
+    <div
+      class="
+        product-details-warranty
+        accordion-container
+        product-additional-info-warranty
+      "
+      data-accordion-container
+    >
+      <div
+        class="product-details-warranty-title accordion-title"
+        data-accordion-toggle
+      >
+        {{lang 'product.warranty'}}
+        <span class="accordion-toggle">
+          <svg><use xlink:href="#icon-plus"></use></svg>
+        </span>
+      </div>
+      <div
+        class="product-details-warranty-content accordion-content"
+        data-accordion-content
+      >
+        {{product.warranty}}
+      </div>
+    </div>
+  {{/if}}
+
+  {{#if product.bulk_discount_rates.length}}
+    <div
+      class="product-details-bulk-pricing accordion-container"
+      data-accordion-container
+    >
+      <div
+        class="product-details-bulk-pricing-title accordion-title"
+        data-accordion-toggle
+      >
+        {{lang 'product.bulk_pricing.title'}}
+        <span class="accordion-toggle">
+          <svg><use xlink:href="#icon-plus"></use></svg>
+        </span>
+      </div>
+      <div
+        class="product-details-warranty-content accordion-content"
+        data-accordion-content
+      >
+        {{#each product.bulk_discount_rates}}
+          <p>
+            {{lang 'product.bulk_pricing.range' min=min max=max}}
+            {{#if type '===' 'percent'}}
+              {{{lang 'product.bulk_pricing.percent' discount=discount.formatted}}}
+            {{/if}}
+            {{#if type '===' 'fixed'}}
+              {{{lang 'product.bulk_pricing.fixed' discount=discount.formatted}}}
+            {{/if}}
+            {{#if type '===' 'price'}}
+              {{{lang 'product.bulk_pricing.price' discount=discount.formatted}}}
+            {{/if}}
+          </p>
+        {{/each}}
+      </div>
+    </div>
+  {{/if}}
+
+  {{> components/reviews/review-modal}}
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+<div data-layout-id="c85cfac0-5ea9-4838-a0df-0304599209ba" class="reassProd">
+<a href="/emballage-livraison/">
+<div data-sub-layout-container="2c29321b-aa14-4e42-ad60-ff268e1007da" data-layout-name="Layout">
+  <style data-container-styling="2c29321b-aa14-4e42-ad60-ff268e1007da">
+    [data-sub-layout-container="2c29321b-aa14-4e42-ad60-ff268e1007da"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="2c29321b-aa14-4e42-ad60-ff268e1007da"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="08a3df36-e37c-4f44-8fa8-7786e7647d42">
+    <style data-column-styling="08a3df36-e37c-4f44-8fa8-7786e7647d42">
+      [data-sub-layout="08a3df36-e37c-4f44-8fa8-7786e7647d42"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="08a3df36-e37c-4f44-8fa8-7786e7647d42"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="08a3df36-e37c-4f44-8fa8-7786e7647d42"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="4a693b6f-46c0-44b9-8ec6-abd82540cc98" data-placement-id="d0fea636-b932-46fa-9d2e-d32196802c54" data-placement-status="ACTIVE"><style>
+    #sd-image-4a693b6f-46c0-44b9-8ec6-abd82540cc98 {
+        display: flex;
+        align-items: center;
+        background: url('https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/embg.png') no-repeat;
+        opacity: calc(100 / 100);
+
+
+            background-size: contain;
+
+            height: auto;
+
+        background-position:
+                center
+                center
+;
+
+
+        padding-top: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+    }
+
+    #sd-image-4a693b6f-46c0-44b9-8ec6-abd82540cc98 * {
+        margin: 0px;
+    }
+
+    #sd-image-4a693b6f-46c0-44b9-8ec6-abd82540cc98 img {
+        width: auto;
+        opacity: 0;
+
+            height: auto;
+    }
+
+    @media only screen and (max-width: 700px) {
+        #sd-image-4a693b6f-46c0-44b9-8ec6-abd82540cc98 {
+        }
+    }
+</style>
+
+<div>
+    
+    <div id="sd-image-4a693b6f-46c0-44b9-8ec6-abd82540cc98" data-edit-mode="">
+        <img src="https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/embg.png" alt="">
+    </div>
+    
+</div>
+
+
+</div>
+  </div>
+  <div data-sub-layout="3f00f221-d7d9-4bec-b530-e254f9e085cf">
+    <style data-column-styling="3f00f221-d7d9-4bec-b530-e254f9e085cf">
+      [data-sub-layout="3f00f221-d7d9-4bec-b530-e254f9e085cf"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="3f00f221-d7d9-4bec-b530-e254f9e085cf"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="3f00f221-d7d9-4bec-b530-e254f9e085cf"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="542a01a2-828e-4215-aa44-f8820396012b" data-placement-id="5278e7cd-df98-4f1d-8135-242ca7765704" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-542a01a2-828e-4215-aa44-f8820396012b {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-542a01a2-828e-4215-aa44-f8820396012b * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-542a01a2-828e-4215-aa44-f8820396012b {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b strong,
+    #sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-542a01a2-828e-4215-aa44-f8820396012b ">
+  <div id="sd-simple-text-editable-542a01a2-828e-4215-aa44-f8820396012b" data-edit-mode="">
+    <p>Un emballage sécurisé</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+<div data-sub-layout-container="1751263c-0c40-4f2b-ba21-b26e17f7d79c" data-layout-name="Layout">
+  <style data-container-styling="1751263c-0c40-4f2b-ba21-b26e17f7d79c">
+    [data-sub-layout-container="1751263c-0c40-4f2b-ba21-b26e17f7d79c"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="1751263c-0c40-4f2b-ba21-b26e17f7d79c"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="b25e10b8-5faa-4e26-a759-8af014300220">
+    <style data-column-styling="b25e10b8-5faa-4e26-a759-8af014300220">
+      [data-sub-layout="b25e10b8-5faa-4e26-a759-8af014300220"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 100%;
+        max-width: 100%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="b25e10b8-5faa-4e26-a759-8af014300220"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="b25e10b8-5faa-4e26-a759-8af014300220"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="d515621a-2a18-4730-9879-784790dae4d6" data-placement-id="426419b7-adbd-47c2-a894-4e980a9a0c2a" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-d515621a-2a18-4730-9879-784790dae4d6 {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-d515621a-2a18-4730-9879-784790dae4d6 * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-d515621a-2a18-4730-9879-784790dae4d6 {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6 {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6 strong,
+    #sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6 strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-d515621a-2a18-4730-9879-784790dae4d6 ">
+  <div id="sd-simple-text-editable-d515621a-2a18-4730-9879-784790dae4d6" data-edit-mode="">
+    <p>Nous emballons nous-même tous nos objets dans des cartons à triple cannelure ou des boîtes en bois.</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+</a>
+<a href="/emballage-livraison/">
+<div data-sub-layout-container="781cd129-b909-4904-9bdf-bf7811511a55" data-layout-name="Layout">
+  <style data-container-styling="781cd129-b909-4904-9bdf-bf7811511a55">
+    [data-sub-layout-container="781cd129-b909-4904-9bdf-bf7811511a55"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="781cd129-b909-4904-9bdf-bf7811511a55"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="505f0a83-60b4-49f4-8152-1ad8b9a75b9e">
+    <style data-column-styling="505f0a83-60b4-49f4-8152-1ad8b9a75b9e">
+      [data-sub-layout="505f0a83-60b4-49f4-8152-1ad8b9a75b9e"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="505f0a83-60b4-49f4-8152-1ad8b9a75b9e"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="505f0a83-60b4-49f4-8152-1ad8b9a75b9e"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="f5a1ae7f-02de-4b6b-9c41-44fb54c9edf5" data-placement-id="c03396a3-f708-475c-97db-5cfdcab05cdf" data-placement-status="ACTIVE"><style>
+    #sd-image-f5a1ae7f-02de-4b6b-9c41-44fb54c9edf5 {
+        display: flex;
+        align-items: center;
+        background: url('https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/icone-atena2.png') no-repeat;
+        opacity: calc(100 / 100);
+
+
+            background-size: contain;
+
+            height: auto;
+
+        background-position:
+                center
+                center
+;
+
+
+        padding-top: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+    }
+
+    #sd-image-f5a1ae7f-02de-4b6b-9c41-44fb54c9edf5 * {
+        margin: 0px;
+    }
+
+    #sd-image-f5a1ae7f-02de-4b6b-9c41-44fb54c9edf5 img {
+        width: auto;
+        opacity: 0;
+
+            height: auto;
+    }
+
+    @media only screen and (max-width: 700px) {
+        #sd-image-f5a1ae7f-02de-4b6b-9c41-44fb54c9edf5 {
+        }
+    }
+</style>
+
+<div>
+    
+    <div id="sd-image-f5a1ae7f-02de-4b6b-9c41-44fb54c9edf5" data-edit-mode="">
+        <img src="https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/icone-atena2.png" alt="">
+    </div>
+    
+</div>
+
+
+</div>
+  </div>
+  <div data-sub-layout="adacb3eb-aa66-4950-a3b4-4e2941d8ca27">
+    <style data-column-styling="adacb3eb-aa66-4950-a3b4-4e2941d8ca27">
+      [data-sub-layout="adacb3eb-aa66-4950-a3b4-4e2941d8ca27"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="adacb3eb-aa66-4950-a3b4-4e2941d8ca27"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="adacb3eb-aa66-4950-a3b4-4e2941d8ca27"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="356afb24-e82d-49a4-8b09-4db8905bc506" data-placement-id="09a598e7-3897-4518-b7d8-199f0b2b02ba" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-356afb24-e82d-49a4-8b09-4db8905bc506 {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-356afb24-e82d-49a4-8b09-4db8905bc506 * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-356afb24-e82d-49a4-8b09-4db8905bc506 {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506 {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506 strong,
+    #sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506 strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-356afb24-e82d-49a4-8b09-4db8905bc506 ">
+  <div id="sd-simple-text-editable-356afb24-e82d-49a4-8b09-4db8905bc506" data-edit-mode="">
+    <p>Une livraison rapide</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+<div data-sub-layout-container="59968e55-08ae-4528-ac03-3f5d5840295d" data-layout-name="Layout">
+  <style data-container-styling="59968e55-08ae-4528-ac03-3f5d5840295d">
+    [data-sub-layout-container="59968e55-08ae-4528-ac03-3f5d5840295d"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="59968e55-08ae-4528-ac03-3f5d5840295d"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="47c2a5bc-22f2-4386-ac51-da345883dec4">
+    <style data-column-styling="47c2a5bc-22f2-4386-ac51-da345883dec4">
+      [data-sub-layout="47c2a5bc-22f2-4386-ac51-da345883dec4"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 100%;
+        max-width: 100%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="47c2a5bc-22f2-4386-ac51-da345883dec4"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="47c2a5bc-22f2-4386-ac51-da345883dec4"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="ee84d216-eb60-4e99-bf59-05b90f8b301c" data-placement-id="faf6490c-3c8e-4c3f-8e45-8e24e247661a" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-ee84d216-eb60-4e99-bf59-05b90f8b301c {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-ee84d216-eb60-4e99-bf59-05b90f8b301c * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-ee84d216-eb60-4e99-bf59-05b90f8b301c {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c strong,
+    #sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-ee84d216-eb60-4e99-bf59-05b90f8b301c ">
+  <div id="sd-simple-text-editable-ee84d216-eb60-4e99-bf59-05b90f8b301c" data-edit-mode="">
+    <p>Nous assurons la livraison dans le monde entier avec des partenaires de confiance.</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+
+</a>
+
+<a href="/notre-garantie/">
+
+<div data-sub-layout-container="b65d052d-0e4f-4976-a529-205a3fd40bf1" data-layout-name="Layout">
+  <style data-container-styling="b65d052d-0e4f-4976-a529-205a3fd40bf1">
+    [data-sub-layout-container="b65d052d-0e4f-4976-a529-205a3fd40bf1"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="b65d052d-0e4f-4976-a529-205a3fd40bf1"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="cead8dee-b23d-4dfd-85e5-073105046d74">
+    <style data-column-styling="cead8dee-b23d-4dfd-85e5-073105046d74">
+      [data-sub-layout="cead8dee-b23d-4dfd-85e5-073105046d74"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="cead8dee-b23d-4dfd-85e5-073105046d74"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="cead8dee-b23d-4dfd-85e5-073105046d74"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="594b0d54-bf1f-4112-af94-21fc0713873d" data-placement-id="0f2106d4-2247-4ba5-8895-e80166931b5e" data-placement-status="ACTIVE"><style>
+    #sd-image-594b0d54-bf1f-4112-af94-21fc0713873d {
+        display: flex;
+        align-items: center;
+        background: url('https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/icone-atena6.png') no-repeat;
+        opacity: calc(100 / 100);
+
+
+            background-size: contain;
+
+            height: auto;
+
+        background-position:
+                center
+                center
+;
+
+
+        padding-top: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+    }
+
+    #sd-image-594b0d54-bf1f-4112-af94-21fc0713873d * {
+        margin: 0px;
+    }
+
+    #sd-image-594b0d54-bf1f-4112-af94-21fc0713873d img {
+        width: auto;
+        opacity: 0;
+
+            height: auto;
+    }
+
+    @media only screen and (max-width: 700px) {
+        #sd-image-594b0d54-bf1f-4112-af94-21fc0713873d {
+        }
+    }
+</style>
+
+<div>
+    
+    <div id="sd-image-594b0d54-bf1f-4112-af94-21fc0713873d" data-edit-mode="">
+        <img src="https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/icone-atena6.png" alt="">
+    </div>
+    
+</div>
+
+
+</div>
+  </div>
+  <div data-sub-layout="985a774b-feae-4d4c-b40c-68a494799b91">
+    <style data-column-styling="985a774b-feae-4d4c-b40c-68a494799b91">
+      [data-sub-layout="985a774b-feae-4d4c-b40c-68a494799b91"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="985a774b-feae-4d4c-b40c-68a494799b91"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="985a774b-feae-4d4c-b40c-68a494799b91"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="a192d90d-2332-4af5-b9de-e4f59ee9ed2e" data-placement-id="781a09ab-7f61-4c04-b9f5-27f725088744" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-a192d90d-2332-4af5-b9de-e4f59ee9ed2e {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-a192d90d-2332-4af5-b9de-e4f59ee9ed2e * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-a192d90d-2332-4af5-b9de-e4f59ee9ed2e {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e strong,
+    #sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-a192d90d-2332-4af5-b9de-e4f59ee9ed2e ">
+  <div id="sd-simple-text-editable-a192d90d-2332-4af5-b9de-e4f59ee9ed2e" data-edit-mode="">
+    <p>Des garanties</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+<div data-sub-layout-container="24fba21e-96e4-4951-b914-32d7c1ea7857" data-layout-name="Layout">
+  <style data-container-styling="24fba21e-96e4-4951-b914-32d7c1ea7857">
+    [data-sub-layout-container="24fba21e-96e4-4951-b914-32d7c1ea7857"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="24fba21e-96e4-4951-b914-32d7c1ea7857"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="0c17f6f7-0cda-4ebd-9ef0-66edd94fc1ef">
+    <style data-column-styling="0c17f6f7-0cda-4ebd-9ef0-66edd94fc1ef">
+      [data-sub-layout="0c17f6f7-0cda-4ebd-9ef0-66edd94fc1ef"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 100%;
+        max-width: 100%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="0c17f6f7-0cda-4ebd-9ef0-66edd94fc1ef"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="0c17f6f7-0cda-4ebd-9ef0-66edd94fc1ef"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="2c853434-c97c-443c-90c5-92a542416eef" data-placement-id="0e9b7dc6-63b1-441a-954c-f68e1015bab8" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-2c853434-c97c-443c-90c5-92a542416eef {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-2c853434-c97c-443c-90c5-92a542416eef * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-2c853434-c97c-443c-90c5-92a542416eef {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef strong,
+    #sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-2c853434-c97c-443c-90c5-92a542416eef ">
+  <div id="sd-simple-text-editable-2c853434-c97c-443c-90c5-92a542416eef" data-edit-mode="">
+    <p>Tous nos objets sont assurés par AXA Art</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+
+</a>
+<a href="/paiement-securise/">
+    
+<div data-sub-layout-container="0fbe7436-7fa0-49cf-8075-7a082768f15a" data-layout-name="Layout">
+  <style data-container-styling="0fbe7436-7fa0-49cf-8075-7a082768f15a">
+    [data-sub-layout-container="0fbe7436-7fa0-49cf-8075-7a082768f15a"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="0fbe7436-7fa0-49cf-8075-7a082768f15a"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="0ede6ac6-bd8a-4a25-9f69-065d78270b1c">
+    <style data-column-styling="0ede6ac6-bd8a-4a25-9f69-065d78270b1c">
+      [data-sub-layout="0ede6ac6-bd8a-4a25-9f69-065d78270b1c"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="0ede6ac6-bd8a-4a25-9f69-065d78270b1c"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="0ede6ac6-bd8a-4a25-9f69-065d78270b1c"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="29938567-5d79-4e99-8842-43be5f91139d" data-placement-id="2a376a2e-d452-4713-8be2-9110dcb2517b" data-placement-status="ACTIVE"><style>
+    #sd-image-29938567-5d79-4e99-8842-43be5f91139d {
+        display: flex;
+        align-items: center;
+        background: url('https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/icone-atena-01.png') no-repeat;
+        opacity: calc(100 / 100);
+
+
+            background-size: contain;
+
+            height: auto;
+
+        background-position:
+                center
+                center
+;
+
+
+        padding-top: 0px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+        padding-left: 0px;
+
+        margin-top: 0px;
+        margin-right: 0px;
+        margin-bottom: 0px;
+        margin-left: 0px;
+    }
+
+    #sd-image-29938567-5d79-4e99-8842-43be5f91139d * {
+        margin: 0px;
+    }
+
+    #sd-image-29938567-5d79-4e99-8842-43be5f91139d img {
+        width: auto;
+        opacity: 0;
+
+            height: auto;
+    }
+
+    @media only screen and (max-width: 700px) {
+        #sd-image-29938567-5d79-4e99-8842-43be5f91139d {
+        }
+    }
+</style>
+
+<div>
+    
+    <div id="sd-image-29938567-5d79-4e99-8842-43be5f91139d" data-edit-mode="">
+        <img src="https://cdn11.bigcommerce.com/s-xb1qbja2ke/product_images/uploaded_images/icone-atena-01.png" alt="">
+    </div>
+    
+</div>
+
+
+</div>
+  </div>
+  <div data-sub-layout="33bb1e05-7976-4598-96da-ecc3d994133e">
+    <style data-column-styling="33bb1e05-7976-4598-96da-ecc3d994133e">
+      [data-sub-layout="33bb1e05-7976-4598-96da-ecc3d994133e"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 50%;
+        max-width: 50%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="33bb1e05-7976-4598-96da-ecc3d994133e"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="33bb1e05-7976-4598-96da-ecc3d994133e"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="2a6c0f74-5474-48d0-b199-6fa5ae19a5d9" data-placement-id="3e73df9e-4d16-45fb-b720-8bf57a930caf" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 strong,
+    #sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9 ">
+  <div id="sd-simple-text-editable-2a6c0f74-5474-48d0-b199-6fa5ae19a5d9" data-edit-mode="">
+    <p>Un paiement sécurisé</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+<div data-sub-layout-container="c05bc357-65e8-4414-9231-e2b434e7a406" data-layout-name="Layout">
+  <style data-container-styling="c05bc357-65e8-4414-9231-e2b434e7a406">
+    [data-sub-layout-container="c05bc357-65e8-4414-9231-e2b434e7a406"] {
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: wrap;
+      z-index: 0;
+      position: relative;
+    }
+    [data-sub-layout-container="c05bc357-65e8-4414-9231-e2b434e7a406"]:after {
+      background-position: center center;
+      background-size: cover;
+      auto content: "";
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+  </style>
+  <div data-sub-layout="00b6146d-f610-411b-8729-07a6736e7bd8">
+    <style data-column-styling="00b6146d-f610-411b-8729-07a6736e7bd8">
+      [data-sub-layout="00b6146d-f610-411b-8729-07a6736e7bd8"] {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        flex-basis: 100%;
+        max-width: 100%;
+        z-index: 0;
+        justify-content: center;
+        padding-right: 10.5px;
+        padding-left: 10.5px;
+        position: relative;
+      }
+      [data-sub-layout="00b6146d-f610-411b-8729-07a6736e7bd8"]:after {
+        background-position: center center;
+        background-size: cover;
+        auto content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      @media only screen and (max-width: 700px) {
+        [data-sub-layout="00b6146d-f610-411b-8729-07a6736e7bd8"] {
+          flex-basis: 100%;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <div data-widget-id="9436b4d8-2bb2-4206-b831-b4527a9ea803" data-placement-id="ab0a98b5-1841-49bd-9247-87d17427988f" data-placement-status="ACTIVE"><style>
+    .sd-simple-text-9436b4d8-2bb2-4206-b831-b4527a9ea803 {
+      padding-top: 0px;
+      padding-right: 0px;
+      padding-bottom: 0px;
+      padding-left: 0px;
+
+      margin-top: 0px;
+      margin-right: 0px;
+      margin-bottom: 0px;
+      margin-left: 0px;
+
+    }
+
+    .sd-simple-text-9436b4d8-2bb2-4206-b831-b4527a9ea803 * {
+      margin: 0;
+      padding: 0;
+
+        color: #333333;
+        font-family: inherit;
+        font-weight: 500;
+        font-size: 24px;
+        min-height: 24px;
+
+    }
+
+    .sd-simple-text-9436b4d8-2bb2-4206-b831-b4527a9ea803 {
+        text-align: center;
+    }
+
+    #sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803 {
+      min-width: 14px;
+      line-height: 1.5;
+      display: inline-block;
+    }
+
+    #sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803[data-edit-mode="true"]:hover,
+    #sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803[data-edit-mode="true"]:active,
+    #sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803[data-edit-mode="true"]:focus {
+      outline: 1px dashed #3C64F4;
+    }
+
+    #sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803 strong,
+    #sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803 strong * {
+      font-weight: bold;
+    }
+</style>
+
+<div class="sd-simple-text-9436b4d8-2bb2-4206-b831-b4527a9ea803 ">
+  <div id="sd-simple-text-editable-9436b4d8-2bb2-4206-b831-b4527a9ea803" data-edit-mode="">
+    <p>Payez en toute sérénité, notre site est sécurisé</p>
+  </div>
+</div>
+
+</div>
+  </div>
+</div>
+</a></div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+</div>

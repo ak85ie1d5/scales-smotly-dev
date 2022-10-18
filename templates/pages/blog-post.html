@@ -39,7 +39,7 @@
 
   {{#if blog.post.tags.length}}
     <div class="blog-post-tags">
-      <h4 class="blog-post-tags-title">{{lang 'blog.tag_title'}}</h4>
+      <p class="blog-post-tags-title">{{lang 'blog.tag_title'}}</p>
       {{#each blog.post.tags}}
         <a href="{{url}}" title="{{lang 'blog.tag_permalink' tag=name}}">{{lang 'blog.tag_formatted' tag=name}}</a>{{#unless @last}},&nbsp;{{/unless}}
       {{/each}}

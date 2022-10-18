@@ -76,6 +76,14 @@
   }
 }
 
+.product-collection-description {
+    @include col(1, 1, $gap: ($gutter-third / 2))
+    text-align: center;
+    a {
+        text-decoration: underline;
+    }
+}
+
 // Pagination
 .category-pagination {
   width: 100%;

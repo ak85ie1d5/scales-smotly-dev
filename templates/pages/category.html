@@ -19,11 +19,11 @@ category:
   <main class="product-collection-container" data-collection>
 
     <section class="product-collection-container-inner">
-
-      {{> components/collection/collection-sorting
-          collection=category
-          sort=pagination.category.sort
-          show_sort=theme_settings.collection-products-show-sort}}
+    
+          {{> components/collection/collection-sorting
+              collection=category
+              sort=pagination.category.sort
+              show_sort=theme_settings.collection-products-show-sort}}
 
       <aside class="product-collection-filter-sidebar" data-collection-sidebar>
         {{> components/collection/category/category-sidebar}}

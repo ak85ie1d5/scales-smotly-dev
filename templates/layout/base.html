@@ -1,6 +1,8 @@
 <!doctype html>
 <html class="no-js" lang="{{ locale_name }}">
 <head>
+    <link rel="alternate" href="{{#if settings.request.absolute_path '==' '/'}}https://galerie-atena.com/{{else}}https://galerie-atena.com/{{settings.request.absolute_path}}{{/if}}" hreflang="fr-fr" />
+    <link rel="alternate" href="{{#if settings.request.absolute_path '==' '/'}}https://en.galerie-atena.com/{{else}}https://en.galerie-atena.com/{{settings.request.absolute_path}}{{/if}}" hreflang="en-en" />
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>{{head.title}}</title>
 

@@ -6,7 +6,7 @@
     display: inline-block;
 
     @include breakpoint(m-down) {
-      //@extend %revealer-fade;
+      @extend %revealer-fade;
       @include coverer();
       position: fixed;
       z-index: 30;
@@ -359,7 +359,7 @@
 
 .header-navigation-overlay {
   @include breakpoint(m-down) {
-    //@extend %revealer-fade;
+    @extend %revealer-fade;
     @include coverer();
     position: fixed;
     z-index: 25;

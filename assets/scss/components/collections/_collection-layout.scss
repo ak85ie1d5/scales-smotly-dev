@@ -77,11 +77,11 @@
 }
 
 .product-collection-description {
-  @include col(1, 1, $gap: ($gutter-third / 2));
-  text-align: center;
-  a {
-    text-decoration: underline;
-  }
+    @include col(1, 1, $gap: ($gutter-third / 2))
+    text-align: center;
+    a {
+        text-decoration: underline;
+    }
 }
 
 // Pagination
@@ -101,7 +101,7 @@
   text-align: center;
 
   span {
-    //@extend %meta-text;
+    @extend %meta-text;
     @extend %smallcaps;
     display: table-cell;
     vertical-align: middle;

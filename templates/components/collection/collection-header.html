@@ -20,6 +20,10 @@
         {{{lang 'search.heading' query=(sanitize forms.search.query)}}}
       {{/if}}
     </h1>
+    
+    {{#if collection.description}}
+        {{{collection.description}}}
+    {{/if}}
 
     {{#if theme_settings.collection-products-show-breadcrumbs}}
       {{> components/common/breadcrumbs}}

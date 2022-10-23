@@ -10,4 +10,5 @@ vendor/bundle
 .bundle
 *.js.map
 *.zip
-.idea/
+/.idea
+/nbproject

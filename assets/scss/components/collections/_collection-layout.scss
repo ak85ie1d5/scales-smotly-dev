@@ -77,7 +77,7 @@
 }
 
 .product-collection-description {
-    @include col(1, 1, $gap: ($gutter-third / 2))
+    @include col(1, 1, $gap: ($gutter-third / 2));
     text-align: center;
     a {
         text-decoration: underline;
@@ -101,7 +101,7 @@
   text-align: center;
 
   span {
-    @extend %meta-text;
+    @extend %metatext;
     @extend %smallcaps;
     display: table-cell;
     vertical-align: middle;

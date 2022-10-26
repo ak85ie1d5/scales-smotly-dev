@@ -2,7 +2,7 @@
   <section class="images-overlay-inner-container" data-overlay-image-list>
     {{#each product.images}}
       <figure class="product-gallery-overlay-image" data-overlay-image data-image-id="{{@index}}">
-        <img src="{{getImage this 'small'}}" srcset="{{getImage this 'medium'}}&640w 640w, {{getImage this 'large'}}&960w 960w, {{getImage this 'zoom'}}&1280w 1280w" alt="{{this.alt}}" width="1365px" />
+        <img src="{{getImage this 'small'}}" srcset="{{getImage this 'medium'}} 640w, {{getImage this 'large'}} 960w, {{getImage this 'zoom'}} 1280w" alt="{{this.alt}}" width="1365px" />
       </figure>
     {{/each}}
   </section>

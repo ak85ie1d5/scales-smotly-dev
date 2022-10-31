@@ -189,6 +189,7 @@
   font-weight: normal;
   text-transform: none;
   transition: all 0.3s $ease-out-quad;
+  text-transform: uppercase;
 
   @include breakpoint(m-down) { padding: 0; }
   @include breakpoint(ms-down) { font-size: $h6-size; }

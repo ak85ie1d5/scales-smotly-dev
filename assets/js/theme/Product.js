@@ -17,25 +17,47 @@ export default class Product extends PageManager {
   }
 
   loaded(next) {
-    this.imagesOverlay = new ProductImagesOverlay($('[data-product-gallery-overlay]'), this.context);
 
-    this.alert = new Alert($('[data-product-message]'));
-    this.quantityControl = new QuantityWidget({scope: '[data-cart-item-add]'});
+    const bodySize = document.getElementsByTagName("body")[0]["clientWidth"];
 
-    new ProductReviews(this.context);
+    // Disable product galery overlay for mobiles.
+    if (bodySize > 576) {
+      this.imagesOverlay = new ProductImagesOverlay($('[data-product-gallery-overlay]'), this.context);
 
-    this.ProductUtils = new ProductUtils(this.el, {
-      priceWithoutTaxTemplate: productViewTemplates.priceWithoutTax,
-      priceWithTaxTemplate: productViewTemplates.priceWithTax,
-      priceSavedTemplate: productViewTemplates.priceSaved,
-      callbacks: {
-        willUpdate: () => LoadingOverlay($('[data-main-content]'), true),
-        didUpdate: () => LoadingOverlay($('[data-main-content]'), true),
-        switchImage: _.bind(this.imagesOverlay.newImage, this.imagesOverlay),
-      },
-    }).init(this.context);
+      this.alert = new Alert($('[data-product-message]'));
+      this.quantityControl = new QuantityWidget({scope: '[data-cart-item-add]'});
 
-    this._bindOverlayToggle();
+      new ProductReviews(this.context);
+
+      this.ProductUtils = new ProductUtils(this.el, {
+        priceWithoutTaxTemplate: productViewTemplates.priceWithoutTax,
+        priceWithTaxTemplate: productViewTemplates.priceWithTax,
+        priceSavedTemplate: productViewTemplates.priceSaved,
+        callbacks: {
+          willUpdate: () => LoadingOverlay($('[data-main-content]'), true),
+          didUpdate: () => LoadingOverlay($('[data-main-content]'), true),
+          switchImage: _.bind(this.imagesOverlay.newImage, this.imagesOverlay),
+        },
+      }).init(this.context);
+
+      this._bindOverlayToggle();
+
+    } else {
+      const element = document.getElementById("product-gallery-overlay");
+      element.remove();
+
+      this.alert = new Alert($('[data-product-message]'));
+      this.quantityControl = new QuantityWidget({scope: '[data-cart-item-add]'});
+
+      new ProductReviews(this.context);
+
+      this.ProductUtils = new ProductUtils(this.el, {
+        priceWithoutTaxTemplate: productViewTemplates.priceWithoutTax,
+        priceWithTaxTemplate: productViewTemplates.priceWithTax,
+        priceSavedTemplate: productViewTemplates.priceSaved,
+        callbacks: {},
+      }).init(this.context);
+    }
 
     next();
   }

@@ -1,5 +1,6 @@
 // Container
 .blog-post-single {
+  @extend %container-padding-small;
   @include container();
   margin: $gutter-double auto;
 }

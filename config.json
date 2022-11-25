@@ -1,5 +1,5 @@
 {
-  "name": "Scales - Smotly Dev (1)",
+  "name": "Scales - Smotly Dev (1) (2)",
   "version": "2.6.2",
   "css_compiler": "scss",
   "autoprefixer_cascade": true,
@@ -279,8 +279,10 @@
           "google_amp"
         ]
       },
-      "settings": {},
-      "images": {}
+      "settings": {
+      },
+      "images": {
+      }
     },
     {
       "name": "Modern",

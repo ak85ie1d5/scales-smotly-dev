@@ -1,8 +1,10 @@
 // Container
 .product-details {
-  display: block;
-  width: 100%;
   color: $body-color;
+
+  @include breakpoint(m) {
+    @include col(1, 1, $gap: ($gutter-third / 2));
+  }
 }
 
 // Brand
@@ -21,7 +23,7 @@
 // Title
 .product-details-title {
   @extend %h3;
-  margin-top: $gutter-third;
+  margin-top: 0;
   font-family: $single-product-title-font-family;
   font-weight: normal;
   text-align: center;

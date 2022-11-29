@@ -170,18 +170,7 @@ figure a {
 */
 // mass end
 
-.product-single-details-container {
-  display: inline-block;
-  vertical-align: top;
-  width: 24rem;
-  padding-left: 80px;
-  font-size: 15px;
-  transition: all .3s cubic-bezier(.25,.46,.45,.94);
-  position: absolute;
-  float: right;
-  top: 156px;
-  right: 4%;
-}
+
 
 @media only screen and (max-width: 430px) {
     .product-single-details-container {

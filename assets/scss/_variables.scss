@@ -27,7 +27,7 @@ $branding-size: 0;
 @if (stencilString("header-branding-size") == "header-branding-large") { $branding-size: 250px; }
 
 $header-tools-width: 120px;
-$product-options-width: 330px;
+$product-options-width: 304px;
 $collection-sidebar-width: 230px;
 $cart-totals-width: 300px;
 $cart-item-image-width: 120px;

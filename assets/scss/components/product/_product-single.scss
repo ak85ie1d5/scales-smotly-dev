@@ -1,9 +1,8 @@
 // Container
 .product-single-container {
-  @include container();
-  @include row();
-  display: block;
-  width: 100%;
+  display: flex;
+  justify-content: end;
+  flex-direction: column;
   padding: $gutter-double $gutter 0;
   margin-bottom: $gutter-double;
   transition: all 0.3s $ease-out-quad;
@@ -11,6 +10,10 @@
   @include breakpoint(m-down) {
     padding: $gutter $gutter-third 0;
     margin-bottom: $gutter;
+  }
+
+  @include breakpoint(m) {
+    flex-direction: row;
   }
 
   @include breakpoint(s-down) {
@@ -22,18 +25,17 @@
 // Images
 .product-single-image-list {
   @include align(middle);
-  width: calc(100% - #{$product-options-width});
+  max-width: 890px;
+  margin: 0 auto;
   font-size: $body-font-size;
   text-align: center;
   transition: all 0.3s $ease-out-quad;
 
   @include breakpoint(ms-down) {
-    width: 50%;
-    padding-right: $gutter-half;
+    width: 100%;
   }
 
   @include breakpoint(s-down) {
-    width: 100%;
     padding: 0;
   }
 
@@ -48,18 +50,21 @@
 // Details
 .product-single-details-container {
   @include align(top);
-  width: $product-options-width;
-  padding-left: 80px;
+  max-width: $product-options-width;
   font-size: $body-font-size;
   transition: all 0.3s $ease-out-quad;
 
+
+  @include breakpoint(xl) {
+    margin-right: 43px;
+  }
+
   @include breakpoint(ms-down) {
-    width: 50%;
-    padding-left: $gutter-half;
+    width: 100%;
+    max-width: 100%;
   }
 
   @include breakpoint(s-down) {
-    width: 100%;
     padding-top: $gutter;
     padding-left: 0;
   }

@@ -313,7 +313,8 @@
       {{{product.description}}}
       {{#if product.custom_fields}}
       {{#each product.custom_fields}}
-        <div class="product-additional-info-container product-additional-custom-fields-{{@index}}">
+
+        <div class="product-additional-info-container product-additional-custom-fields {{#if name '===' 'Identifier Exists'}}product-additional-custom-fields-hidden{{/if}}">
           <span class="product-additional-info-key">
             {{name}}
           </span>

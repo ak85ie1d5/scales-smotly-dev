@@ -17,7 +17,6 @@
 
   <div class="product-item-container">
 
-<!-- Custom    <a class="product-item-image-link slides-item" title="{{name}}">-->
 <a class="product-item-image-link slides-item" href="{{url}}" title="{{name}}">
         {{#if image}}
             <div class="slider-cell">
@@ -158,20 +157,16 @@
 
 
 <script type="text/javascript">
-
     function hasNumber(myString) {
       return /\d/.test(myString);
     }
 
-    console.log('---');
     var els = document.getElementsByClassName("product-item-price");
     Array.prototype.forEach.call(els, function(el) {
         if (hasNumber(el.textContent) == false) {
             el.textContent = "VENDU";
         }
-        // console.log(hasNumber(el.textContent));
     });
-    console.log('-');
 </script>
 
 

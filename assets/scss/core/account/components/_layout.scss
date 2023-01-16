@@ -8,6 +8,10 @@
   vertical-align: top;
 }
 
+.account-wishlist-wrapper {
+  display: grid;
+}
+
 .account-body {
   @media screen and (min-width: $account-breakpoint-small) {
     float: right;
@@ -16,7 +20,7 @@
   }
 
   @media screen and (min-width: $account-breakpoint-medium) {
-    width: 75%;
+    width: 100%;
   }
 
   > :first-child {

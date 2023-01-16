@@ -1,5 +1,12 @@
 # Change Log
 
+### [unreleased] - unreleased
+
+### [2.6.3] - 2022-09-30
+#### Fixed
+- Incorrect display of Diners Club card icon. Incorrect translation key for added 14-digit Diners Club card type. Cannot save 16-digit Diners Club card type as a payment method. [#21](https://github.com/bigcommerce/scales/pull/21)
+- Wishlist-details.html does not support pagination. [#18](https://github.com/bigcommerce/scales/pull/18)
+
 ### [2.6.2] - 2021-09-10
 #### Changed
 - Increment Version after Price Discount termination

@@ -1,6 +1,6 @@
 {
-  "name": "Scales - Smotly Dev (26/11/2022 - 11:48 GMT+1)",
-  "version": "2.6.2",
+  "name": "Scales - Smotly Dev (16/01/2023 - 15:01 GMT+1)",
+  "version": "2.6.3",
   "css_compiler": "scss",
   "autoprefixer_cascade": true,
   "autoprefixer_browsers": [
@@ -136,7 +136,7 @@
     "footer-color": "#454545",
     "footer-background": "#EEEEEE",
     "footer_theme_credits": false,
-    "footer_sitemap": true,
+    "footer_sitemap": false,
     "footer_copyright": false,
     "footer_payment_visa": true,
     "footer_payment_mastercard": true,
@@ -414,7 +414,7 @@
         "footer-color": "#454545",
         "footer-background": "#EEEEEE",
         "footer_theme_credits": false,
-        "footer_sitemap": true,
+        "footer_sitemap": false,
         "footer_copyright": false,
         "footer_payment_visa": true,
         "footer_payment_mastercard": true,

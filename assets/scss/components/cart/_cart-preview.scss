@@ -250,7 +250,7 @@ $cart-preview-border-color: $border-color;
   max-width: 50px;
 
   svg {
-    width: 100%;
+    width: auto;
     height: 100%;
     max-width: 50px;
     fill: lighten($cart-preview-color, 25%);

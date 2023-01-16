@@ -257,6 +257,10 @@
   @include row();
 }
 
+.product-additional-custom-fields-hidden{
+  display: none;
+}
+
 .product-additional-info-key,
 .product-additional-info-value {
   @extend %paragraph;
